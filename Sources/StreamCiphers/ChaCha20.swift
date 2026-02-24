@@ -9,7 +9,7 @@ import Foundation
 @preconcurrency import CryptoSwift
 import Encryption
 
-public final class ChaChaStream: StreamCipher, @unchecked Sendable {
+public final class ChaChaStream: StreamCipher {
 
     private var chacha: ChaCha20
     private var key: Data

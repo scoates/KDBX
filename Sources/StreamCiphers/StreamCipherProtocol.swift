@@ -7,7 +7,7 @@
 
 import Foundation
 
-public protocol StreamCipher: AnyObject, Sendable {
+public protocol StreamCipher: AnyObject {
     func decrypt(encryptedData: Data) throws -> Data
     func encrypt(data: Data) throws -> Data
     func refresh(key: Data, nonce: Data) throws
