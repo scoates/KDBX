@@ -98,9 +98,10 @@ public final class EntryXML: Serializable, XMLObjectDeserialization, ModifyListe
                          times: times,
                          name: entryName)
     }
-    public static func deserialize(_ element: XMLIndexer, streamCipher: inout (any StreamCipher)?) throws -> EntryXML {
+
+    public static func deserialize(_ element: XMLIndexer, streamCipher: (any StreamCipher)?) throws -> EntryXML {
         var keyVals: [KeyValXML] = try element["String"].all.map { keyval in
-            return try KeyValXML.deserialize(keyval, streamCipher: &streamCipher)
+            return try KeyValXML.deserialize(keyval, streamCipher: streamCipher)
         }
         var entryNameXMLString: XMLString? = try? element["EntryName"].value()
         if entryNameXMLString == nil {
@@ -134,17 +135,16 @@ public final class EntryXML: Serializable, XMLObjectDeserialization, ModifyListe
                          name: entryName)
     }
 
-    public func serialize(base64Encoded: Bool, streamCipher: inout (any StreamCipher)?) throws -> String {
+    public func serialize(base64Encoded: Bool, streamCipher: (any StreamCipher)?) throws -> String {
         let keyvalsString = try KeyVals.map({ kv in
-            return try kv.serialize(base64Encoded: false, streamCipher: &streamCipher)
+            return try kv.serialize(base64Encoded: false, streamCipher: streamCipher)
         }).joined(separator: "\n")
-        var nilCipher: (any StreamCipher)? = nil
         return try """
                 <Entry>
                 \(UUID.serialize())
                 \(name.serialize())
                 \(iconID.serialize())
-                \(times.serialize(base64Encoded: true, streamCipher: &nilCipher))
+                \(times.serialize())
                 \(keyvalsString)
                 </Entry>
             """

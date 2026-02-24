@@ -47,18 +47,7 @@ public final class ColorXML: XMLObjectDeserialization, Serializable {
             alpha: element["Alpha"].value())
     }
 
-    public func serialize(base64Encoded: Bool = false, streamCipher: inout (any StreamCipher)?) throws -> String {
-        return """
-<Color>
-    <Red>\(red)</Red>
-    <Green>\(green)</Green>
-    <Blue>\(blue)</Blue>
-    <Alpha>\(alpha)</Alpha>
-</Color>
-"""
-    }
-
-    public func serialize() -> String {
+    public func serialize(base64Encoded: Bool = false, streamCipher: (any StreamCipher)? = nil) throws -> String {
         return """
 <Color>
     <Red>\(red)</Red>

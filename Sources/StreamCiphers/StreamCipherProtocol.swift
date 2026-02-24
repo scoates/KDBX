@@ -1,14 +1,14 @@
 //
 //  StreamProtocol.swift
-//  
+//
 //
 //  Created by John Jakobsen on 5/15/23.
 //
 
 import Foundation
 
-public protocol StreamCipher: Sendable {
-    mutating func decrypt(encryptedData: Data) throws -> Data
-    mutating func encrypt(data: Data) throws -> Data
-    mutating func refresh(key: Data, nonce: Data) throws
+public protocol StreamCipher: AnyObject, Sendable {
+    func decrypt(encryptedData: Data) throws -> Data
+    func encrypt(data: Data) throws -> Data
+    func refresh(key: Data, nonce: Data) throws
 }

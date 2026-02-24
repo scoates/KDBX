@@ -45,9 +45,9 @@ public final class GroupXML: XMLObjectDeserialization, Serializable {
         self.entries = entries
     }
 
-    public static func deserialize(_ element: XMLIndexer, streamCipher: inout (any StreamCipher)?) throws -> GroupXML {
+    public static func deserialize(_ element: XMLIndexer, streamCipher: (any StreamCipher)?) throws -> GroupXML {
         let entries = try element["Entry"].all.map { entry in
-            return try EntryXML.deserialize(entry, streamCipher: &streamCipher)
+            return try EntryXML.deserialize(entry, streamCipher: streamCipher)
         }
 
         let times: TimesXML = (try? element["Times"].value()) ?? TimesXML.now(expires: false)
@@ -60,17 +60,16 @@ public final class GroupXML: XMLObjectDeserialization, Serializable {
                          entries: entries)
     }
 
-    public func serialize(base64Encoded: Bool, streamCipher: inout (any StreamCipher)?) throws -> String {
+    public func serialize(base64Encoded: Bool, streamCipher: (any StreamCipher)?) throws -> String {
         let entriesString = try entries.map({ entry in
-            return try entry.serialize(base64Encoded: base64Encoded, streamCipher: &streamCipher)
+            return try entry.serialize(base64Encoded: base64Encoded, streamCipher: streamCipher)
         }).joined(separator: "\n")
-        var nilCipher: (any StreamCipher)? = nil
         return try """
 <Group>
 \(UUID.serialize())
 \(name.serialize())
 \(iconID.serialize())
-\(times.serialize(base64Encoded: true, streamCipher: &nilCipher))
+\(times.serialize())
 \(entriesString)
 </Group>
 """

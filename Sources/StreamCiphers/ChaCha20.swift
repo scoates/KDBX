@@ -9,7 +9,7 @@ import Foundation
 @preconcurrency import CryptoSwift
 import Encryption
 
-public struct ChaChaStream: StreamCipher, Sendable {
+public final class ChaChaStream: StreamCipher, @unchecked Sendable {
 
     private var chacha: ChaCha20
     private var key: Data
@@ -23,7 +23,7 @@ public struct ChaChaStream: StreamCipher, Sendable {
         self.nonce = nonce
     }
 
-    public mutating func decrypt(encryptedData: Data) throws -> Data {
+    public func decrypt(encryptedData: Data) throws -> Data {
         let paddedData = padDataWithDummyBytes(data: encryptedData, paddingLength: decryptOffset)
         let decryptedDataWithPad = try Data(chacha.decrypt(Array(paddedData)))
         let decryptedData = decryptedDataWithPad.subdata(in: decryptOffset..<decryptedDataWithPad.count)
@@ -32,7 +32,7 @@ public struct ChaChaStream: StreamCipher, Sendable {
         return decryptedData
     }
 
-    public mutating func encrypt(data: Data) throws -> Data {
+    public func encrypt(data: Data) throws -> Data {
         let paddedData = padDataWithDummyBytes(data: data, paddingLength: encryptOffset)
         let encryptedDataWithPad = try Data(chacha.encrypt(Array(paddedData)))
         let encryptedData = encryptedDataWithPad.subdata(in: encryptOffset..<encryptedDataWithPad.count)
@@ -41,7 +41,7 @@ public struct ChaChaStream: StreamCipher, Sendable {
         return encryptedData
     }
 
-    public mutating func refresh(key: Data, nonce: Data) throws {
+    public func refresh(key: Data, nonce: Data) throws {
         self.key = key
         self.nonce = nonce
         self.encryptOffset = 0
@@ -49,7 +49,7 @@ public struct ChaChaStream: StreamCipher, Sendable {
         self.chacha = try ChaCha20(key: Array(key), iv: Array(nonce))
     }
 
-    public mutating func reset() {
+    public func reset() {
         encryptOffset = 0
         decryptOffset = 0
     }

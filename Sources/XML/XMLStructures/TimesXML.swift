@@ -54,7 +54,7 @@ public final class TimesXML: XMLObjectDeserialization, Serializable {
         )
     }
 
-    public func serialize(base64Encoded: Bool = true, streamCipher: inout (any StreamCipher)?) throws -> String {
+    public func serialize(base64Encoded: Bool = true, streamCipher: (any StreamCipher)? = nil) throws -> String {
 
         var lmtString = ""
         if let lmt = lastModificationTime {
@@ -76,10 +76,9 @@ public final class TimesXML: XMLObjectDeserialization, Serializable {
             etString = try convertToString(date: et)
         }
 
-        var nilCipher: (any StreamCipher)? = nil
         return try """
 <Times>
-    \(timeOffset != nil ? XMLString(value: String(timeOffset!), name: "TimeOffset").serialize(base64Encoded: false, streamCipher: &nilCipher) : "")
+    \(timeOffset != nil ? XMLString(value: String(timeOffset!), name: "TimeOffset").serialize() : "")
     <LastModificationTime>\(lmtString)</LastModificationTime>
     <CreationTime>\(ctString)</CreationTime>
     <LastAccessTime>\(latString)</LastAccessTime>

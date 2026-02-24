@@ -9,19 +9,19 @@ import Foundation
 import StreamCiphers
 
 public protocol Serializable {
-    func serialize(base64Encoded: Bool, streamCipher: inout (any StreamCipher)?) throws -> String
+    func serialize(base64Encoded: Bool, streamCipher: (any StreamCipher)?) throws -> String
 }
 
 extension Serializable {
-    public func serialize(base64Encoded: Bool = false, streamCipher: inout (any StreamCipher)?) throws -> String {
-        return try serialize(base64Encoded: base64Encoded, streamCipher: &streamCipher)
+    public func serialize(base64Encoded: Bool = false, streamCipher: (any StreamCipher)? = nil) throws -> String {
+        return try serialize(base64Encoded: base64Encoded, streamCipher: streamCipher)
     }
 }
 
 extension Optional where Wrapped: Serializable {
-    func serialize(base64Encoded: Bool = false, streamCipher: inout (any StreamCipher)?) throws -> String {
+    func serialize(base64Encoded: Bool = false, streamCipher: (any StreamCipher)? = nil) throws -> String {
         if let notNil = self {
-            return try notNil.serialize(base64Encoded: base64Encoded, streamCipher: &streamCipher)
+            return try notNil.serialize(base64Encoded: base64Encoded, streamCipher: streamCipher)
         }
         return ""
     }

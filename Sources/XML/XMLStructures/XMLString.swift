@@ -44,10 +44,12 @@ public final class XMLString: XMLValueDeserialization, Serializable {
         }
         return XMLString(value: element.text, name: element.name, properties: attributes)
     }
+
     public static func deserialize(_ attribute: SWXMLHash.XMLAttribute) throws -> XMLString {
         return XMLString(value: attribute.text, name: attribute.name, properties: [:])
     }
-    static func deserialize(_ element: SWXMLHash.XMLElement, base64Encoded: Bool = false, streamCipher: inout (any StreamCipher)?) throws -> XMLString {
+
+    static func deserialize(_ element: SWXMLHash.XMLElement, base64Encoded: Bool = false, streamCipher: (any StreamCipher)? = nil) throws -> XMLString {
 
         guard var valData = element.text.data(using: .utf8) else {
             throw XMLStringError.StringToDataNil
@@ -60,11 +62,8 @@ public final class XMLString: XMLValueDeserialization, Serializable {
             valData = base64Decoded
         }
         let protected: Bool? = element.value(ofAttribute: "Protected")
-        if (streamCipher != nil && protected ?? false) {
-            guard let decryptedData = try streamCipher?.decrypt(encryptedData: valData) else {
-                throw XMLStringError.DecryptedStringNil
-            }
-            valData = decryptedData
+        if let cipher = streamCipher, protected ?? false {
+            valData = try cipher.decrypt(encryptedData: valData)
         }
         guard let strVal = String(data: valData, encoding: .utf8) else {
             throw XMLStringError.DataToStringNil
@@ -85,14 +84,14 @@ public final class XMLString: XMLValueDeserialization, Serializable {
         }.joined(separator: " "))
     }
 
-    public func serialize(base64Encoded: Bool = false, streamCipher: inout (any StreamCipher)?) throws -> String {
+    public func serialize(base64Encoded: Bool = false, streamCipher: (any StreamCipher)? = nil) throws -> String {
 
         guard var strData = value.data(using: .utf8) else {
             throw XMLStringError.StringToDataNil
         }
 
-        if streamCipher != nil && (properties["Protected"] ?? "False") == "True" {
-            strData = try streamCipher!.encrypt(data: strData)
+        if let cipher = streamCipher, (properties["Protected"] ?? "False") == "True" {
+            strData = try cipher.encrypt(data: strData)
         }
 
         if (base64Encoded) {
@@ -108,17 +107,13 @@ public final class XMLString: XMLValueDeserialization, Serializable {
             """
     }
 
-    public func serialize() throws -> String {
-        var nilCipher: (any StreamCipher)? = nil
-        return try serialize(base64Encoded: false, streamCipher: &nilCipher)
-    }
-
     public func isEqual(_ object: XMLString?) -> Bool {
         guard let notNil = object else {
             return false
         }
         return notNil.value == value && notNil.name == name && notNil.properties == properties
     }
+
     public var description: String {
         return "<\(name)\(propertiesXMLize())>\(value)</\(name)>"
     }

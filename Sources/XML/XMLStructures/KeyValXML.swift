@@ -51,7 +51,7 @@ public final class KeyValXML: XMLObjectDeserialization, Serializable, ModifyList
         return key == "Password" || key.contains("Time")
     }
 
-    public static func deserialize(_ element: XMLIndexer, streamCipher: inout (any StreamCipher)?) throws -> KeyValXML {
+    public static func deserialize(_ element: XMLIndexer, streamCipher: (any StreamCipher)?) throws -> KeyValXML {
         guard let keyElement = element["Key"].element else {
             throw KeyValError.UnableToGetKey
         }
@@ -61,7 +61,7 @@ public final class KeyValXML: XMLObjectDeserialization, Serializable, ModifyList
         }
         let key: XMLString = try XMLString.deserialize(keyElement)
 
-        let val: XMLString = try XMLString.deserialize(valElement, base64Encoded: isBase64Encoded(key: key.value), streamCipher: &streamCipher)
+        let val: XMLString = try XMLString.deserialize(valElement, base64Encoded: isBase64Encoded(key: key.value), streamCipher: streamCipher)
 
         return KeyValXML(
             key: key,
@@ -69,13 +69,13 @@ public final class KeyValXML: XMLObjectDeserialization, Serializable, ModifyList
             name: element.element?.name ?? "String")
     }
 
-    public func serialize(base64Encoded: Bool = false, streamCipher: inout (any StreamCipher)?) throws -> String {
+    public func serialize(base64Encoded: Bool = false, streamCipher: (any StreamCipher)? = nil) throws -> String {
         let b64encoded = base64Encoded || KeyValXML.isBase64Encoded(key: key.value)
 
         return try """
             <\(name)>
                     \(key.serialize())
-                    \(value.serialize(base64Encoded: b64encoded, streamCipher: &streamCipher))
+                    \(value.serialize(base64Encoded: b64encoded, streamCipher: streamCipher))
             </\(name)>
             """
     }

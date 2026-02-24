@@ -28,15 +28,14 @@ public class XMLManager {
         let key = hashedKey.prefix(32)
         let nonce = hashedKey.subdata(in: 32..<(32 + 12))
 
-        var chachaStream: (any StreamCipher)? = try ChaChaStream(key: key, nonce: nonce)
-        self.chachaStream = chachaStream as? ChaChaStream
+        let chachaStream = try ChaChaStream(key: key, nonce: nonce)
+        self.chachaStream = chachaStream
         guard let xmlString = String(data: XMLData, encoding: .utf8) else {
             throw ParserError.UnexpectedNilOnOptional
         }
         let xmlParser = XMLHash.parse(xmlString)
         self.meta = try xmlParser["KeePassFile"]["Meta"].value()
-        self.group = try GroupXML.deserialize(xmlParser["KeePassFile"]["Root"]["Group"], streamCipher: &chachaStream)
-        self.chachaStream = chachaStream as? ChaChaStream
+        self.group = try GroupXML.deserialize(xmlParser["KeePassFile"]["Root"]["Group"], streamCipher: chachaStream)
         self.group?.modifyListener = self.meta
     }
 
@@ -50,11 +49,9 @@ public class XMLManager {
 
     public init(xmlString: String, chachaStream: ChaChaStream) throws {
         self.chachaStream = chachaStream
-        var streamCipher: (any StreamCipher)? = chachaStream
         let xmlParser = XMLHash.parse(xmlString)
         self.meta = try xmlParser["KeePassFile"]["Meta"].value()
-        self.group = try GroupXML.deserialize(xmlParser["KeePassFile"]["Root"]["Group"], streamCipher: &streamCipher)
-        self.chachaStream = streamCipher as? ChaChaStream
+        self.group = try GroupXML.deserialize(xmlParser["KeePassFile"]["Root"]["Group"], streamCipher: chachaStream)
         self.group?.modifyListener = self.meta
     }
 
@@ -63,10 +60,6 @@ public class XMLManager {
         self.group = group
     }
 
-//    public func modifyMeta(databaseName: String? = nil, databaseDescription: String? = nil) {
-//        self.meta = self.meta?.modify(newDatabaseName: databaseName, newDatabaseDescription: databaseDescription)
-//    }
-    //TODO: Replace self.chachastream with parameter
     public func toXML(streamKey: Data? = nil, nonce: Data? = nil) throws -> String {
         if let key = streamKey, let nonceVal = nonce {
             if self.chachaStream == nil {
@@ -75,36 +68,28 @@ public class XMLManager {
                 try self.chachaStream?.refresh(key: key, nonce: nonceVal)
             }
         }
-        var streamCipher: (any StreamCipher)? = self.chachaStream
-        let result = try """
+        return try """
         <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
         <KeePassFile>
-            \(self.meta?.serialize(base64Encoded: true, streamCipher: &streamCipher) ?? "")
+            \(self.meta?.serialize(base64Encoded: true, streamCipher: self.chachaStream) ?? "")
             <Root>
-                \(self.group?.serialize(base64Encoded: true, streamCipher: &streamCipher) ?? "")
+                \(self.group?.serialize(base64Encoded: true, streamCipher: self.chachaStream) ?? "")
             </Root>
         </KeePassFile>
         """
-        self.chachaStream = streamCipher as? ChaChaStream
-        return result
     }
 
-    public func toXML(streamCipher: inout ChaChaStream) throws -> String {
-        var cipher: (any StreamCipher)? = streamCipher
-        let result = try """
+    public func toXML(streamCipher: ChaChaStream) throws -> String {
+        self.chachaStream = streamCipher
+        return try """
         <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
         <KeePassFile>
-            \(self.meta?.serialize(base64Encoded: true, streamCipher: &cipher) ?? "")
+            \(self.meta?.serialize(base64Encoded: true, streamCipher: streamCipher) ?? "")
             <Root>
-                \(self.group?.serialize(base64Encoded: true, streamCipher: &cipher) ?? "")
+                \(self.group?.serialize(base64Encoded: true, streamCipher: streamCipher) ?? "")
             </Root>
         </KeePassFile>
         """
-        if let updatedCipher = cipher as? ChaChaStream {
-            streamCipher = updatedCipher
-            self.chachaStream = updatedCipher
-        }
-        return result
     }
 
     public func equalContents(_ object: XMLManager?) -> Bool {

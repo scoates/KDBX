@@ -58,15 +58,14 @@ public final class MetaXML: XMLObjectDeserialization, Serializable, ModifyListen
             color: try? element["Color"].value())
     }
 
-    public func serialize(base64Encoded: Bool, streamCipher: inout (any StreamCipher)?) throws -> String {
-        var nilCipher: (any StreamCipher)? = nil
+    public func serialize(base64Encoded: Bool, streamCipher: (any StreamCipher)?) throws -> String {
         return try """
 <Meta>
 \(generator.serialize())
 \(databaseName.serialize())
 \(databaseDescription.serialize())
 \(color?.serialize() ?? "")
-\(times.serialize(base64Encoded: true, streamCipher: &nilCipher))
+\(times.serialize())
 </Meta>
 """
     }
