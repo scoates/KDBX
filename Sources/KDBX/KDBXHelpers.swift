@@ -60,8 +60,6 @@ func stringToUInt8Array(_ input: String) -> [UInt8] {
     return utf8Data?.map { UInt8($0) } ?? []
 }
 
-@available(iOS 13.0, *)
-@available(macOS 13.0, *)
 func aesKDF(seed: Data, info: Data? = nil, outputKeyLength: Int) -> Data? {
     let blockSize = 16
     let numberOfBlocks = Int(ceil(Double(outputKeyLength) / Double(blockSize)))
@@ -110,15 +108,15 @@ extension Data {
     
     func toHexString() -> String {
         var hexString = ""
-        for byte in self.bytes {
+        for byte in self {
             hexString += String(format: "%02X", byte)
         }
         return "0x" + hexString
     }
-    
+
     func toUTF8String() throws -> String {
-        guard let str = String(bytes: self.bytes, encoding: .utf8) else {throw HelperError.String}
-        
+        guard let str = String(data: self, encoding: .utf8) else {throw HelperError.String}
+
         return str.lowercased()
     }
     
@@ -175,8 +173,6 @@ func Data(_ arr: [UInt8]?) -> Data? {
     return res
 }
 
-@available(iOS 13.0, *)
-@available(macOS 13.0, *)
 extension InputStream {
     func readNBytes(n: Int) throws -> Data {
         if (self.streamStatus == .notOpen) {
@@ -206,8 +202,6 @@ extension InputStream {
 }
 
 extension OutputStream {
-    @available(iOS 13.0, *)
-    @available(macOS 13.0, *)
     func write(data: Data) throws {
         if (self.streamStatus == .notOpen) {
             self.open()

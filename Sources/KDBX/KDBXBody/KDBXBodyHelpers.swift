@@ -9,15 +9,11 @@ import Foundation
 import CryptoKit
 import Encryption
 
-@available(iOS 13.0, *)
-@available(macOS 13.0, *)
 func HMACKeyForBlockIndex(index: UInt64, baseHMACKey: Data?) throws -> Data {
     guard let key: Data = baseHMACKey else {throw KDBXBodyError.KeyCreationUnsuccessful}
     return Data(SHA512.hash(data: withUnsafeBytes(of: index.littleEndian) {Data($0)} + key))
 }
 
-@available(iOS 13.0, *)
-@available(macOS 13.0, *)
 func readAllData(from stream: InputStream) throws -> Data {
     if (stream.streamStatus == .notOpen) {
         stream.open()

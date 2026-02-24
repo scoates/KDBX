@@ -1,6 +1,6 @@
 //
 //  Color.swift
-//  
+//
 //
 //  Created by John Jakobsen on 5/17/23.
 //
@@ -9,9 +9,7 @@ import Foundation
 import SWXMLHash
 import StreamCiphers
 
-@available(iOS 15.0, *)
-@available(macOS 13.0, *)
-public final class ColorXML: NSObject, XMLObjectDeserialization, Serializable {
+public final class ColorXML: XMLObjectDeserialization, Serializable {
     var red: Float {
         didSet {
             self.modifyListener?.didModify(date: Date.now)
@@ -33,14 +31,14 @@ public final class ColorXML: NSObject, XMLObjectDeserialization, Serializable {
         }
     }
     internal var modifyListener: ModifyListener? = nil
-    
+
     public init(red: Float, green: Float, blue: Float, alpha: Float) {
         self.red = red
         self.green = green
         self.blue = blue
         self.alpha = alpha
     }
-    
+
     public static func deserialize(_ element: XMLIndexer) throws -> ColorXML {
         return try ColorXML(
             red: element["Red"].value(),
@@ -48,6 +46,18 @@ public final class ColorXML: NSObject, XMLObjectDeserialization, Serializable {
             blue: element["Blue"].value(),
             alpha: element["Alpha"].value())
     }
+
+    public func serialize(base64Encoded: Bool = false, streamCipher: inout (any StreamCipher)?) throws -> String {
+        return """
+<Color>
+    <Red>\(red)</Red>
+    <Green>\(green)</Green>
+    <Blue>\(blue)</Blue>
+    <Alpha>\(alpha)</Alpha>
+</Color>
+"""
+    }
+
     public func serialize() -> String {
         return """
 <Color>
@@ -58,12 +68,12 @@ public final class ColorXML: NSObject, XMLObjectDeserialization, Serializable {
 </Color>
 """
     }
-    
+
     public func isEqual(_ object: ColorXML?) -> Bool {
         guard let notNil = object else {
             return false
         }
-        
+
         return (notNil.red == red &&
                 notNil.green == green &&
                 notNil.blue == blue &&

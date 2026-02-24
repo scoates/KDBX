@@ -61,9 +61,9 @@ final class KDBXHelpersTests: XCTestCase {
     }
     
     func testUIntToData() {
-        var testUInt: UInt32 = 0x9AA2D903
+        let testUInt: UInt32 = 0x9AA2D903
         let data: Data = testUInt.data
-        XCTAssert(data.bytes == [3, 217, 162, 154])
+        XCTAssertEqual(Array(data), [3, 217, 162, 154])
     }
     
 }

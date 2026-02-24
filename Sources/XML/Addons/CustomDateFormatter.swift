@@ -7,7 +7,7 @@
 
 import Foundation
 
-class CustomDateFormatter: DateFormatter {
+class CustomDateFormatter: DateFormatter, @unchecked Sendable {
     override init() {
         super.init()
         dateFormat = "E MMM d HH:mm:ss yyyy z"

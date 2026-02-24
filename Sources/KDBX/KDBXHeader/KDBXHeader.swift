@@ -16,9 +16,6 @@ enum Cipher {
     case ChaCha20
 }
 
-@available(iOS 15.0, *)
-@available(macOS 10.15, *)
-@available(macOS 13.0, *)
 class KDBXHeader {
     var cipherID: Data? = nil
     var compressionFlag: Bool? = nil
@@ -478,8 +475,8 @@ class KDBXHeader {
     }
     
     func createTLV(type: UInt8, data: Data) throws -> Data {
-        let length = UInt32(data.count.magnitude).littleEndian.data.bytes
-        return Data([type] + length + data.bytes)
+        let length = Array(UInt32(data.count.magnitude).littleEndian.data)
+        return Data([type] + length + Array(data))
     }
     
     func _writeNBytes(stream: OutputStream, data: Data, saveBytes: Bool = true) throws {

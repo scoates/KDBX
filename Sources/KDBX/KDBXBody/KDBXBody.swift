@@ -11,9 +11,7 @@ import Encryption
 import Gzip
 import XML
 
-@available(iOS 15.0, *)
-@available(macOS 13.0, *)
-class KDBXBody: NSObject {
+class KDBXBody {
     var streamCipher: UInt32?
     var binary: Data?
     
@@ -164,8 +162,8 @@ class KDBXBody: NSObject {
     // Save Section
     
     func createTLV(type: UInt8, data: Data) throws -> Data {
-        let length = UInt32(data.count.magnitude).littleEndian.data.bytes
-        return Data([type] + length + data.bytes)
+        let length = Array(UInt32(data.count.magnitude).littleEndian.data)
+        return Data([type] + length + Array(data))
     }
     
     func createInnerHeader(streamKey: Data) throws -> Data {
