@@ -90,7 +90,6 @@ public class XMLManager {
     }
 
     public func toXML(streamCipher: inout ChaChaStream) throws -> String {
-        self.chachaStream = streamCipher
         var cipher: (any StreamCipher)? = streamCipher
         let result = try """
         <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -101,8 +100,10 @@ public class XMLManager {
             </Root>
         </KeePassFile>
         """
-        self.chachaStream = cipher as? ChaChaStream
-        streamCipher = self.chachaStream!
+        if let updatedCipher = cipher as? ChaChaStream {
+            streamCipher = updatedCipher
+            self.chachaStream = updatedCipher
+        }
         return result
     }
 
