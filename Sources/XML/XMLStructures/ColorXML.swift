@@ -58,14 +58,10 @@ public final class ColorXML: XMLObjectDeserialization, Serializable {
 """
     }
 
-    public func isEqual(_ object: ColorXML?) -> Bool {
-        guard let notNil = object else {
-            return false
-        }
+}
 
-        return (notNil.red == red &&
-                notNil.green == green &&
-                notNil.blue == blue &&
-                notNil.alpha == alpha)
+extension ColorXML: Equatable {
+    public static func == (lhs: ColorXML, rhs: ColorXML) -> Bool {
+        lhs.red == rhs.red && lhs.green == rhs.green && lhs.blue == rhs.blue && lhs.alpha == rhs.alpha
     }
 }

@@ -89,7 +89,7 @@ public final class TimesXML: XMLObjectDeserialization, Serializable {
     }
 
     public func update(modified: Bool, date: Date? = nil) {
-        if (modified) {
+        if modified {
             self.lastModificationTime = date ?? Date.now
         }
         self.lastAccessedTime = date ?? Date.now

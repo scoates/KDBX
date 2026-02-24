@@ -194,37 +194,6 @@ public final class EntryXML: Serializable, XMLObjectDeserialization, ModifyListe
         return self.iconID.value
     }
 
-    public func isEqual(_ object: EntryXML?) -> Bool {
-        guard let notNil = object else {
-            return false
-        }
-        var keyValsEq = true
-        for kv in KeyVals {
-            var found = false
-            for kv2 in notNil.KeyVals {
-                if kv.isEqual(kv2) {
-                    found = true
-                    break
-                }
-            }
-            if !found {
-                keyValsEq = false
-                break
-            }
-        }
-        keyValsEq = keyValsEq && notNil.KeyVals.count == KeyVals.count
-        return (keyValsEq &&
-                notNil.iconID.isEqual(iconID) &&
-                notNil.name.isEqual(name))
-    }
-
-    public var description: String {
-        let keyValsStr = KeyVals.map { kv in
-            return kv.description
-        }.joined(separator: "\n")
-        return "KeyVals: [\(keyValsStr)]\niconID: \(iconID)\nname: \(name)\n"
-    }
-
     public func getValueWith(key: String) -> String? {
         for kv in KeyVals {
             if kv.key.value == key {
@@ -234,4 +203,23 @@ public final class EntryXML: Serializable, XMLObjectDeserialization, ModifyListe
         return nil
     }
 
+}
+
+extension EntryXML: CustomStringConvertible {
+    public var description: String {
+        let keyValsStr = KeyVals.map { $0.description }.joined(separator: "\n")
+        return "KeyVals: [\(keyValsStr)]\niconID: \(iconID)\nname: \(name)\n"
+    }
+}
+
+extension EntryXML: Equatable {
+    public static func == (lhs: EntryXML, rhs: EntryXML) -> Bool {
+        guard lhs.KeyVals.count == rhs.KeyVals.count else { return false }
+        for kv in lhs.KeyVals {
+            if !rhs.KeyVals.contains(kv) {
+                return false
+            }
+        }
+        return lhs.iconID == rhs.iconID && lhs.name == rhs.name
+    }
 }

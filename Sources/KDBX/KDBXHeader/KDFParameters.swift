@@ -110,14 +110,14 @@ class KDFParameters {
             self.keyType = KeyDerivationAlgorithm.Unknown
         }
         self.UUID = uuidT
-        if (self.keyType == .AESKDF) {
+        if self.keyType == .AESKDF {
             guard let rT = variantMap["r"] as? UInt64 else {throw KDFParametersError.ParseValue}
             self.R = rT
-            
+
             guard let sT = variantMap["s"] as? Data else {throw KDFParametersError.ParseValue}
-            if (sT.count != 32) {throw KDFParametersError.IllegalValue}
+            if sT.count != 32 {throw KDFParametersError.IllegalValue}
             self.S = sT
-        } else if (self.keyType == .Argon2d || self.keyType == .Argon2id) {
+        } else if self.keyType == .Argon2d || self.keyType == .Argon2id {
             guard let sT = variantMap["s"] as? Data else {throw KDFParametersError.ParseValue} //
             self.SArgon = sT
             

@@ -55,7 +55,7 @@ public final class ChaChaStream: StreamCipher {
     }
 
     private func padDataWithDummyBytes(data: Data, paddingLength: Int) -> Data {
-        if (paddingLength <= 0) {
+        if paddingLength <= 0 {
             return data
         }
         let dummyBytes = Data(repeating: 0x00, count: paddingLength)

@@ -113,34 +113,23 @@ public final class GroupXML: XMLObjectDeserialization, Serializable {
         return self.entries
     }
 
-    public func isEqual(_ object: GroupXML?) -> Bool {
-        guard let notNil = object else {
-            return false
-        }
-        var entriesEq = true
-        for entry in entries {
-            var found = false
-            for entry2 in notNil.entries {
-                if entry.isEqual(entry2) {
-                    found = true
-                    break
-                }
-            }
-            if !found {
-                entriesEq = false
-                break
-            }
-        }
-        entriesEq = entriesEq && notNil.entries.count == entries.count
-        return (notNil.name.isEqual(name) &&
-                notNil.iconID.isEqual(iconID) &&
-                entriesEq)
-    }
+}
 
+extension GroupXML: CustomStringConvertible {
     public var description: String {
-        let entriesStr = entries.map { entry in
-            return entry.description
-        }.joined(separator: "\n")
+        let entriesStr = entries.map { $0.description }.joined(separator: "\n")
         return "name: \(name)\niconID: \(iconID)\nentries: \(entriesStr)"
+    }
+}
+
+extension GroupXML: Equatable {
+    public static func == (lhs: GroupXML, rhs: GroupXML) -> Bool {
+        guard lhs.entries.count == rhs.entries.count else { return false }
+        for entry in lhs.entries {
+            if !rhs.entries.contains(entry) {
+                return false
+            }
+        }
+        return lhs.name == rhs.name && lhs.iconID == rhs.iconID
     }
 }

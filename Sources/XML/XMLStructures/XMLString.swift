@@ -55,7 +55,7 @@ public final class XMLString: XMLValueDeserialization, Serializable {
             throw XMLStringError.StringToDataNil
         }
 
-        if (base64Encoded) {
+        if base64Encoded {
             guard let base64Decoded = Data(base64Encoded: element.text) else {
                 throw XMLStringError.UnableToBase64Decode
             }
@@ -94,7 +94,7 @@ public final class XMLString: XMLValueDeserialization, Serializable {
             strData = try cipher.encrypt(data: strData)
         }
 
-        if (base64Encoded) {
+        if base64Encoded {
             strData = strData.base64EncodedData()
         }
 
@@ -107,14 +107,16 @@ public final class XMLString: XMLValueDeserialization, Serializable {
             """
     }
 
-    public func isEqual(_ object: XMLString?) -> Bool {
-        guard let notNil = object else {
-            return false
-        }
-        return notNil.value == value && notNil.name == name && notNil.properties == properties
-    }
+}
 
+extension XMLString: CustomStringConvertible {
     public var description: String {
-        return "<\(name)\(propertiesXMLize())>\(value)</\(name)>"
+        "<\(name)\(propertiesXMLize())>\(value)</\(name)>"
+    }
+}
+
+extension XMLString: Equatable {
+    public static func == (lhs: XMLString, rhs: XMLString) -> Bool {
+        lhs.value == rhs.value && lhs.name == rhs.name && lhs.properties == rhs.properties
     }
 }

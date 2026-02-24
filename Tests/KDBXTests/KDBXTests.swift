@@ -59,8 +59,8 @@ class KDBXTests: XCTestCase {
         print(kdbx.group)
 
         let mockDB = try helperCreateMockManager()
-        XCTAssertTrue(mockDB.meta.isEqual(kdbx.meta))
-        XCTAssertTrue(mockDB.group.isEqual(kdbx.group))
+        XCTAssertEqual(mockDB.meta, kdbx.meta)
+        XCTAssertEqual(mockDB.group, kdbx.group)
     }
 
     func testEncryption() throws {
@@ -79,8 +79,8 @@ class KDBXTests: XCTestCase {
         mockEncryptedStream?.open()
         let mockKDBXFromEncryptedFile = try KDBX.fromEncryptedStream(mockEncryptedStream!, password: "butter")
         mockEncryptedStream?.close()
-        XCTAssertTrue(mockKDBX.meta.isEqual(mockKDBXFromEncryptedFile.meta))
-        XCTAssertTrue(mockKDBX.group.isEqual(mockKDBXFromEncryptedFile.group))
+        XCTAssertEqual(mockKDBX.meta, mockKDBXFromEncryptedFile.meta)
+        XCTAssertEqual(mockKDBX.group, mockKDBXFromEncryptedFile.group)
 
         // Clean up
         try? FileManager.default.removeItem(at: tempFileURL)

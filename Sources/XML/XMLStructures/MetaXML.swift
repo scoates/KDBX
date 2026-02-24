@@ -94,15 +94,18 @@ public final class MetaXML: XMLObjectDeserialization, Serializable, ModifyListen
         self.times.update(modified: true, date: date)
     }
 
-    public func isEqual(_ object: MetaXML?) -> Bool {
-        guard let notNil = object else {
-            return false
-        }
-        return (notNil.generator.isEqual(generator) &&
-                notNil.databaseName.isEqual(databaseName) &&
-                notNil.databaseDescription.isEqual(databaseDescription))
-    }
+}
+
+extension MetaXML: CustomStringConvertible {
     public var description: String {
-        return "Generator: \(generator.description)\nDatabase Name: \(databaseName.description)\nDatabase Description: \(databaseDescription.description)"
+        "Generator: \(generator.description)\nDatabase Name: \(databaseName.description)\nDatabase Description: \(databaseDescription.description)"
+    }
+}
+
+extension MetaXML: Equatable {
+    public static func == (lhs: MetaXML, rhs: MetaXML) -> Bool {
+        lhs.generator == rhs.generator &&
+        lhs.databaseName == rhs.databaseName &&
+        lhs.databaseDescription == rhs.databaseDescription
     }
 }

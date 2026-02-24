@@ -36,7 +36,7 @@ class KDBXBody {
         }
         
         var innerData = decryptedData
-        if (header.compressionFlag ?? true) {
+        if header.compressionFlag ?? true {
             innerData = try decryptedData.gunzipped()
         }
         let decryptedInnerDataStream = InputStream(data: innerData)
@@ -80,7 +80,7 @@ class KDBXBody {
         let blockLength: Data = try stream.readNBytes( n: 4)
         let n: UInt32 = blockLength.toUnsignedInteger()
         
-        if (n == 0) {
+        if n == 0 {
             return nil
         }
         let blockContent = try stream.readNBytes( n: Int(n))
@@ -95,7 +95,7 @@ class KDBXBody {
     }
     
     static func deblockifyData(stream: InputStream, baseHMACKey: Data) throws -> Data {
-        if (stream.streamStatus == .notOpen) {
+        if stream.streamStatus == .notOpen {
             stream.open()
         }
         defer {
@@ -103,7 +103,7 @@ class KDBXBody {
         }
         var i: UInt64 = 0
         var blocks = Data()
-        while (stream.hasBytesAvailable) {
+        while stream.hasBytesAvailable {
             guard let blockContent = try getBlockContent(stream: stream, index: i, baseHMACKey: baseHMACKey) else {
                 return blocks
             }
@@ -118,7 +118,7 @@ class KDBXBody {
         let type = try stream.readNBytes(n: 1)
         let lengthData = try stream.readNBytes(n: 4)
         let length: UInt32 = lengthData.toUnsignedInteger()
-        if (type[0] == 0) {
+        if type[0] == 0 {
             return (type: type[0], size: nil, data: nil)
         }
         let value = try stream.readNBytes(n: Int(length))
@@ -194,7 +194,7 @@ class KDBXBody {
                 throw KDBXBodyError.UnableToGetPointerAddress
             }
             let writeResult = stream.write(pointerAddress, maxLength: n)
-            if (writeResult == -1 || writeResult != n) {
+            if writeResult == -1 || writeResult != n {
                 throw KDBXBodyError.UnableToWrite
             }
         }
@@ -244,7 +244,7 @@ class KDBXBody {
         }
         workingData += xmlData
         
-        if (header.compressionFlag ?? false) {
+        if header.compressionFlag ?? false {
             workingData = try workingData.gzipped()
         }
         guard let key = header.encryptionKey else {throw KDBXBodyError.NoKey}

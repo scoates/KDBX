@@ -96,7 +96,7 @@ public class XMLManager {
         guard let notNil = object else {
             return false
         }
-        return self.group?.isEqual(notNil.group) ?? false && self.meta?.isEqual(notNil.meta) ?? false
+        return self.group == notNil.group && self.meta == notNil.meta
     }
 
 }

@@ -84,11 +84,11 @@ public final class KeyValXML: XMLObjectDeserialization, Serializable, ModifyList
         self.modifyListener?.didModify(date: date)
     }
 
-    public func isEqual(_ object: KeyValXML?) -> Bool {
-        guard let notNil = object else {
-            return false
-        }
-        return notNil.key.isEqual(key) && notNil.value.isEqual(value) && notNil.name == name
+}
+
+extension KeyValXML: Equatable {
+    public static func == (lhs: KeyValXML, rhs: KeyValXML) -> Bool {
+        lhs.key == rhs.key && lhs.value == rhs.value && lhs.name == rhs.name
     }
 }
 

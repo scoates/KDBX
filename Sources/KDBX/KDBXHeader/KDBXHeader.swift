@@ -222,7 +222,7 @@ class KDBXHeader {
             guard tT.count == 1 else {throw KDBXHeaderError.VariantMapParse}
             let type = KDBXHeader._byteToVariantMapType(byte: tT[0])
             
-            if (type == .EndOfMap) {return ("", nil, VariantMapType.EndOfMap)}
+            if type == .EndOfMap { return ("", nil, VariantMapType.EndOfMap) }
             
             guard let ksT = try _readNBytes(stream: stream, n: 4, saveBytes: false) else {throw KDBXHeaderError.VariantMapParse}
             guard ksT.count == 4 else {throw KDBXHeaderError.VariantMapParse}
@@ -291,7 +291,7 @@ class KDBXHeader {
         while (stream.hasBytesAvailable) {
             do {
                 let (key, val, type) = try _readVariantMapEntry(stream: stream)
-                if (type == .EndOfMap) {
+                if type == .EndOfMap {
                     break
                 }
                 variantMap[key] = val
@@ -315,7 +315,7 @@ class KDBXHeader {
     
     func _readHeaderTLV(stream: InputStream) throws -> Bool {
 
-        if (!stream.hasBytesAvailable) {
+        if !stream.hasBytesAvailable {
             return false
         }
         let code: HeaderTypeCode
@@ -388,19 +388,19 @@ class KDBXHeader {
         let sig1: UInt32 = sig1Bytes.toUnsignedInteger()
         guard let sig2Bytes = try _readNBytes(stream: stream, n: 4) else {throw KDBXHeaderError.SignatureParse}
         let sig2: UInt32 = sig2Bytes.toUnsignedInteger()
-        if (sig2 != KDBXHeader.signature2 || sig1 != KDBXHeader.signature1) {
+        if sig2 != KDBXHeader.signature2 || sig1 != KDBXHeader.signature1 {
             throw KDBXHeaderError.WrongSignature
         }
         guard let vMinorBytes = try _readNBytes(stream: stream, n: 2) else {throw KDBXHeaderError.VersionParse}
         guard let vMajorBytes = try _readNBytes(stream: stream, n: 2) else {throw KDBXHeaderError.VersionParse}
         let vMajor: UInt16 = vMajorBytes.toUnsignedInteger()
-        if (vMajor != KDBXHeader.kdbxVMajor) {
+        if vMajor != KDBXHeader.kdbxVMajor {
             throw KDBXHeaderError.WrongMajorVersion
         }
-        while (stream.hasBytesAvailable) {
+        while stream.hasBytesAvailable {
             do {
                 let res = try _readHeaderTLV(stream: stream)
-                if (!res) {return}
+                if !res { return }
             } catch {
                 throw error
             }
@@ -481,8 +481,8 @@ class KDBXHeader {
     
     func _writeNBytes(stream: OutputStream, data: Data, saveBytes: Bool = true) throws {
         try stream.write(data: data)
-        if (saveBytes) {
-            if (headerBytes == nil) {
+        if saveBytes {
+            if headerBytes == nil {
                 headerBytes = Data()
             }
             headerBytes?.append(contentsOf: [UInt8](data))
@@ -490,8 +490,8 @@ class KDBXHeader {
     }
     func _readNBytes(stream: InputStream, n: Int, saveBytes: Bool = true) throws -> Data? {
         let data = try stream.readNBytes(n: n)
-        if (saveBytes) {
-            if (self.headerBytes == nil) {
+        if saveBytes {
+            if self.headerBytes == nil {
                 self.headerBytes = Data()
             }
             self.headerBytes?.append(data)

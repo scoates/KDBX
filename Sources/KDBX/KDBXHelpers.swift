@@ -175,7 +175,7 @@ func Data(_ arr: [UInt8]?) -> Data? {
 
 extension InputStream {
     func readNBytes(n: Int) throws -> Data {
-        if (self.streamStatus == .notOpen) {
+        if self.streamStatus == .notOpen {
             self.open()
             guard self.streamStatus == .open else {
                 throw HelperError.CannotOpenClosedStream
@@ -193,7 +193,7 @@ extension InputStream {
             return Data()
         }
         var arrSize = bufferSize
-        if (bytesRead < n) {
+        if bytesRead < n {
             arrSize = bytesRead
         }
         let dataRead = _pointerToArray(buffer: buffer, bufferSize: arrSize)
@@ -203,7 +203,7 @@ extension InputStream {
 
 extension OutputStream {
     func write(data: Data) throws {
-        if (self.streamStatus == .notOpen) {
+        if self.streamStatus == .notOpen {
             self.open()
             guard self.streamStatus == .open else {
                 throw HelperError.CannotOpenClosedStream
@@ -218,7 +218,7 @@ extension OutputStream {
                 throw KDBXBodyError.UnableToGetPointerAddress
             }
             let writeResult = self.write(pointerAddress, maxLength: n)
-            if (writeResult == -1 || writeResult != n) {
+            if writeResult == -1 || writeResult != n {
                 throw KDBXBodyError.UnableToWrite
             }
         }

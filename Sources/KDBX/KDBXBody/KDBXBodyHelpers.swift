@@ -15,7 +15,7 @@ func HMACKeyForBlockIndex(index: UInt64, baseHMACKey: Data?) throws -> Data {
 }
 
 func readAllData(from stream: InputStream) throws -> Data {
-    if (stream.streamStatus == .notOpen) {
+    if stream.streamStatus == .notOpen {
         stream.open()
     }
     let bufferSize = 4096
@@ -28,7 +28,7 @@ func readAllData(from stream: InputStream) throws -> Data {
 }
 
 func decryptData(encryptedData: Data, key: Data, encryptionIV: Data, cipher: Cipher) throws -> Data? {
-    switch (cipher) {
+    switch cipher {
     case .AES128CBC:
         // TODO: Check implementation of AES 128 CBC cipher
         return decryptAESCBC(data: encryptedData, key: key, iv: Data(encryptionIV), type: .s128)
@@ -45,7 +45,7 @@ func decryptData(encryptedData: Data, key: Data, encryptionIV: Data, cipher: Cip
 }
 
 func encryptData(decryptedData: Data, key: Data, encryptionIV: Data, cipher: Cipher) throws -> Data {
-    switch (cipher) {
+    switch cipher {
     case .AES128CBC:
         // TODO: Check implementation of AES 128 CBC cipher
         guard let encryptedData = encryptAESCBC(data: decryptedData, key: key, iv: encryptionIV, type: .s128) else {
