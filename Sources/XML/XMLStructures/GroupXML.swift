@@ -85,7 +85,7 @@ public final class GroupXML: XMLObjectDeserialization, Serializable {
 
     public func removeEntry(UUID: String) {
         self.entries.removeAll { entry in
-            return entry.UUID.value != UUID
+            entry.UUID.value == UUID
         }
 
         let updateDate: Date = Date.now

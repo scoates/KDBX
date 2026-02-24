@@ -21,16 +21,17 @@ public final class EntryXML: Serializable, XMLObjectDeserialization, ModifyListe
     public var name: XMLString
     internal var modifyListener: ModifyListener?
 
-    public lazy var email: String? = {
-        return getValueWith(key: "Email")
-    }()
+    public var email: String? {
+        getValueWith(key: "Email")
+    }
 
-    public lazy var username: String? = {
-        return getValueWith(key: "Username")
-    }()
-    public lazy var password: String? = {
-        return getValueWith(key: "Password")
-    }()
+    public var username: String? {
+        getValueWith(key: "Username")
+    }
+
+    public var password: String? {
+        getValueWith(key: "Password")
+    }
 
     internal init(KeyVals: [KeyValXML], UUID: XMLString, iconID: XMLString, times: TimesXML, name: XMLString) {
         self.KeyVals = KeyVals
@@ -166,7 +167,7 @@ public final class EntryXML: Serializable, XMLObjectDeserialization, ModifyListe
 
     public func removeKeyVal(key: String) {
         self.KeyVals.removeAll { kv in
-            return kv.key.value != key
+            kv.key.value == key
         }
         let updateDate: Date = Date.now
         self.times.update(modified: true, date: updateDate)
